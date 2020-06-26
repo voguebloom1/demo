@@ -53,7 +53,7 @@ public class SpreadMoneyServiceImpl implements SpreadMoneyService {
 
         // 7일 동안 조회 가능
         if(isExpireDate(spreadMoneyInfo.getStartDate(), 604800)){
-            throw new InvalidParameterException(ErrorMessage.EXPIRE_DATE);
+            throw new InvalidParameterException(ErrorMessage.EXPIRED_DATE);
         }
 
         return spreadMoneyInfo;
@@ -77,7 +77,7 @@ public class SpreadMoneyServiceImpl implements SpreadMoneyService {
 
         //10분간만 유효하다.
         if(isExpireDate(spreadMoneyInfo.getStartDate(), 600)){
-            throw new InvalidParameterException(ErrorMessage.EXPIRE_DATE);
+            throw new InvalidParameterException(ErrorMessage.EXPIRED_DATE);
         }
 
         // 해당 유저가 받았는지 체크 한다. (한번만 가능)

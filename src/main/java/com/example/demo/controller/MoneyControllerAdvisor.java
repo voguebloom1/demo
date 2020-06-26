@@ -36,7 +36,7 @@ public class MoneyControllerAdvisor {
     ErrorResponse spreadMoneyError(InvalidUserException e){
         return ErrorResponse.builder()
                 .success(false)
-                .code("200")
+                .code("401")
                 .message(e.getMessage()).build();
     }
 
