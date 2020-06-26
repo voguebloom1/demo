@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/demo
+    username: root
+    password: mariadb
+
+http:
+  encoding:
+    charset: UTF-8
+    enabled: true
+    force: true
+
