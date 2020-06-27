@@ -26,13 +26,13 @@ public class SpreadMoneyInfo extends BasicEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String userId;
+    private long userId;
     private String roomId;
     private String token;
 
     private Date startDate;
-    private int  spreadMoney;
-    private int  receivedMoney;
+    private long  spreadMoney;
+    private long  receivedMoney;
 
     // 받은 사용자 정보.
     @OneToMany(cascade = CascadeType.ALL)

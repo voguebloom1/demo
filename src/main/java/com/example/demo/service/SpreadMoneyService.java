@@ -8,7 +8,7 @@ public interface SpreadMoneyService {
 
     SpreadMoneyInfo getSpreadMoneyStatus(BasicInfo basicInfo, String token);
 
-    int getSpreadMoney(BasicInfo basicInfo, String token);
+    long getSpreadMoney(BasicInfo basicInfo, String token);
 
     String createSpreadMoney(BasicInfo basicInfo ,SpreadMoneyRequest spreadMoneyRequest);
 

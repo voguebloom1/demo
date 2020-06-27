@@ -44,7 +44,7 @@ public class SpreadMoneyController {
     @GetMapping("/moneys/{token}/receive")
     public ResponseEntity<Object> getSpreadMoney(@RequestAttribute BasicInfo basicInfo,
                                                  @PathVariable String token){
-        int money = spreadMoneyService.getSpreadMoney(basicInfo, token);
+        long money = spreadMoneyService.getSpreadMoney(basicInfo, token);
         Map<String, Object> result = new HashMap<>();
         result.put("money", money);
         return ResponseEntity.ok().body(new ResponseModel(true, result));

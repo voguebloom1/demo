@@ -7,9 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpreadMoneyRequest {
-    private int money;
+    private long money;
     private int people;
-
     @Override
     public String toString() {
         return "{"

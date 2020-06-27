@@ -21,8 +21,8 @@ public class ReceivedInfo extends BasicEntity {
     @Column(name="spread_money_info_id")
     private int spreadMoneyInfoId;
 
-    private int money;
-    private String userId;
+    private long money;
+    private long userId;
     private boolean state;
 
 }

@@ -44,22 +44,69 @@ public class SpreadMoneyInfoMoneyControllerTest {
     @Autowired
     MockMvc mvc;
 
-    /*** 조회 API  ***/
-    @MockBean()
+    @MockBean
     private SpreadMoneyService spreadMoneyService;
 
+    private static final long userId = 123456789;
+    private static final String roomId = "test_room";
+    private static final String token = "$1A";
+
+    @Test
+    void filter_InvalidUserId_word() throws Exception{
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", "$124FA")
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        actions.andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    void filter_InvalidUserId_zero() throws Exception{
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", "0")
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        actions.andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    void filter_InvalidRoomId_Blank() throws Exception{
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", ""))
+                .andDo(print());
+
+        actions.andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+
+
+    /*** 조회 API  ***/
     // 정상 응답
     @Test
     void getSpreadMoneyStatus_OK() throws Exception{
-        String token = "123";
+
+        long receivedUserId = 987654321;
+
         Date startDate = new Date();
         List<ReceivedInfo> list = Arrays.asList(
-                ReceivedInfo.builder().money(200).state(true).spreadMoneyInfoId(1).userId("321").build()
+                ReceivedInfo.builder().money(200).state(true).spreadMoneyInfoId(1).userId(receivedUserId).build()
         );
         SpreadMoneyInfo spreadMoneyInfo = SpreadMoneyInfo.builder()
                 .id(1)
-                .token("123").startDate(startDate).spreadMoney(5000).receivedMoney(3000)
-                .roomId("testRoom").userId("123").receivedInfoList(list).build();
+                .token(token).startDate(startDate).spreadMoney(5000).receivedMoney(3000)
+                .roomId(roomId).userId(userId).receivedInfoList(list).build();
 
 
         //given
@@ -69,8 +116,8 @@ public class SpreadMoneyInfoMoneyControllerTest {
         //when
         final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room"))
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
                 .andDo(print());
 
         //then
@@ -79,7 +126,7 @@ public class SpreadMoneyInfoMoneyControllerTest {
                 .andExpect(jsonPath("$.result.spreadMoneyInfo.spreadMoney", is(5000)))
                 .andExpect(jsonPath("$.result.spreadMoneyInfo.receivedMoney", is(3000)))
                 .andExpect(jsonPath("$.result.spreadMoneyInfo.receivedList[0].money", is(200)))
-                .andExpect(jsonPath("$.result.spreadMoneyInfo.receivedList[0].userId", is("321")))
+                .andExpect(jsonPath("$.result.spreadMoneyInfo.receivedList[0].userId", is(987654321)))
                 .andDo(print());
         verify(spreadMoneyService, times(1)).getSpreadMoneyStatus(any(BasicInfo.class), eq(token));
     }
@@ -87,7 +134,6 @@ public class SpreadMoneyInfoMoneyControllerTest {
     // 잘못된 토근으로 조회 시도
     @Test
     void getSpreadMoneyStatus_Invalid_Token() throws Exception{
-        String token = "123";
 
         //given
         given(spreadMoneyService.getSpreadMoneyStatus(any(BasicInfo.class), eq(token)))
@@ -96,8 +142,8 @@ public class SpreadMoneyInfoMoneyControllerTest {
         //when
         final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room"))
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
                 .andDo(print());
 
         //then
@@ -112,7 +158,6 @@ public class SpreadMoneyInfoMoneyControllerTest {
     // 다른 유저가 조회 시도
     @Test
     void getSpreadMoneyStatus_Invalid_User() throws Exception{
-        String token = "123";
 
         //given
         given(spreadMoneyService.getSpreadMoneyStatus(any(BasicInfo.class), eq(token)))
@@ -121,8 +166,8 @@ public class SpreadMoneyInfoMoneyControllerTest {
         //when
         final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room"))
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
                 .andDo(print());
 
         //then
@@ -146,8 +191,8 @@ public class SpreadMoneyInfoMoneyControllerTest {
         //when
         final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/status")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room"))
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
                 .andDo(print());
 
         //then
@@ -161,28 +206,122 @@ public class SpreadMoneyInfoMoneyControllerTest {
 
     /*** 받기 API  ***/
     @Test
-    void getSpreadMoney_OK(){
+    void getSpreadMoney_OK() throws Exception{
+        String token = "123";
 
+        //given
+        given(spreadMoneyService.getSpreadMoney(any(BasicInfo.class), eq(token)))
+                .willReturn((long) 3000);
+
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        //then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.result.money", is(3000)))
+                .andDo(print());
+        verify(spreadMoneyService, times(1)).getSpreadMoney(any(BasicInfo.class), eq(token));
     }
 
     @Test
-    void getSpreadMoney_Duplicate_User(){
+    void getSpreadMoney_Duplicate_User() throws Exception{
+        String token = "123";
 
+        //given
+        given(spreadMoneyService.getSpreadMoney(any(BasicInfo.class), eq(token)))
+                .willThrow(new InvalidParameterException(ErrorMessage.DUPLICATE_USER));
+
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        //then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.DUPLICATE_USER)))
+                .andExpect(jsonPath("$.code", is("400")))
+                .andDo(print());
+        verify(spreadMoneyService, times(1)).getSpreadMoney(any(BasicInfo.class), eq(token));
     }
 
     @Test
-    void getSpreadMoney_Create_User(){
+    void getSpreadMoney_Create_User() throws Exception{
+        String token = "123";
 
+        //given
+        given(spreadMoneyService.getSpreadMoney(any(BasicInfo.class), eq(token)))
+                .willThrow(new InvalidParameterException(ErrorMessage.CREATE_USER));
+
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        //then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.CREATE_USER)))
+                .andExpect(jsonPath("$.code", is("400")))
+                .andDo(print());
+        verify(spreadMoneyService, times(1)).getSpreadMoney(any(BasicInfo.class), eq(token));
     }
 
     @Test
-    void getSpreadMoney_Invalid_RoomId(){
+    void getSpreadMoney_Invalid_RoomId() throws Exception{
+        String token = "123";
 
+        //given
+        given(spreadMoneyService.getSpreadMoney(any(BasicInfo.class), eq(token)))
+                .willThrow(new InvalidParameterException(ErrorMessage.INVALID_ROOM_ID));
+
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        //then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.INVALID_ROOM_ID)))
+                .andExpect(jsonPath("$.code", is("400")))
+                .andDo(print());
+        verify(spreadMoneyService, times(1)).getSpreadMoney(any(BasicInfo.class), eq(token));
     }
 
     @Test
-    void getSpreadMoney_Expired_Date(){
+    void getSpreadMoney_Expired_Date() throws Exception{
+        String token = "123";
 
+        //given
+        given(spreadMoneyService.getSpreadMoney(any(BasicInfo.class), eq(token)))
+                .willThrow(new InvalidParameterException(ErrorMessage.EXPIRED_DATE));
+
+        //when
+        final ResultActions actions = mvc.perform(get("/api/v1/svc/moneys/"+token+"/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId))
+                .andDo(print());
+
+        //then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.EXPIRED_DATE)))
+                .andExpect(jsonPath("$.code", is("400")))
+                .andDo(print());
+        verify(spreadMoneyService, times(1)).getSpreadMoney(any(BasicInfo.class), eq(token));
     }
 
 
@@ -198,8 +337,8 @@ public class SpreadMoneyInfoMoneyControllerTest {
         //when
         final ResultActions actions = mvc.perform(post("/api/v1/svc/moneys")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room")
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId)
                 .content(spreadMoneyRequest.toString()))
                 .andDo(print());
 
@@ -217,20 +356,20 @@ public class SpreadMoneyInfoMoneyControllerTest {
 
         //given
         given(spreadMoneyService.createSpreadMoney(any(BasicInfo.class), any(SpreadMoneyRequest.class)))
-                .willThrow(new InvalidParameterException("invalid parameters"));
+                .willThrow(new InvalidParameterException(ErrorMessage.INVALID_PARAMETERS));
 
         //when
         final ResultActions actions = mvc.perform(post("/api/v1/svc/moneys")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room")
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId)
                 .content(spreadMoneyRequest.toString()))
                 .andDo(print());
 
         //then
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("invalid parameters")))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.INVALID_PARAMETERS)))
                 .andExpect(jsonPath("$.code", is("400")))
                 .andDo(print());
         verify(spreadMoneyService, times(1)).createSpreadMoney(any(BasicInfo.class), any(SpreadMoneyRequest.class));
@@ -242,20 +381,20 @@ public class SpreadMoneyInfoMoneyControllerTest {
 
         //given
         given(spreadMoneyService.createSpreadMoney(any(BasicInfo.class), any(SpreadMoneyRequest.class)))
-                .willThrow(new CreateTokenFailException("The maximum count has been reached"));
+                .willThrow(new CreateTokenFailException(ErrorMessage.TOKEN_MAXIMUM_COUNT));
 
         //when
         final ResultActions actions = mvc.perform(post("/api/v1/svc/moneys")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-USER-ID", "test_user")
-                .header("X-ROOM-ID", "test_room")
+                .header("X-USER-ID", userId)
+                .header("X-ROOM-ID", roomId)
                 .content(spreadMoneyRequest.toString()))
                 .andDo(print());
 
         //then
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("The maximum count has been reached")))
+                .andExpect(jsonPath("$.message", is(ErrorMessage.TOKEN_MAXIMUM_COUNT)))
                 .andExpect(jsonPath("$.code", is("500")))
                 .andDo(print());
         verify(spreadMoneyService, times(1)).createSpreadMoney(any(BasicInfo.class), any(SpreadMoneyRequest.class));

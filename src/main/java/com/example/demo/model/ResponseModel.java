@@ -5,10 +5,7 @@ import lombok.*;
 import java.util.Map;
 
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ResponseModel {
 
     private boolean success;

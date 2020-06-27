@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReceivedInfoRepository extends JpaRepository<ReceivedInfo, Integer> {
 
-    ReceivedInfo findByUserIdAndSpreadMoneyInfoId(String userid, int spreadMoneyInfoId);
+    ReceivedInfo findByUserIdAndSpreadMoneyInfoId(long userid, int spreadMoneyInfoId);
 
     List<ReceivedInfo> findAllByStateAndSpreadMoneyInfoId(boolean state, int spreadMoneyInfoId);
 
