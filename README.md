@@ -2,7 +2,7 @@ demo
 
 /api/v1/svc/moneys
 
-- Token은 대화방 단위로 최대 357,940개 생성 가능.
+- Token은 대화방 단위로 최대 40만개 생성 가능.
 - 7일 지난 뒤 삭제 로직은 미구현 (구현 필요) -> Batch 로직으로 추가(미구현)
 - 기본적으로 UserId, RoomId가 잘못되면 Error
 
