@@ -61,7 +61,7 @@ Request:
 ##### 공통에러
 <table>
 <tr>
-    <td>에러코드</td><td>Status</td><td>설명</td>
+    <th>에러코드</th><th>Status</th><th>설명</th>
 </tr>
 <tr>
     <td>400</td><td>Invalid Parameters</td><td>요청한 Body가 잘못된 정보</td>
@@ -98,7 +98,7 @@ URL : /api/v1/svc/moneys/{token}/receive
 ##### 공통에러
 <table>
 <tr>
-    <td>에러코드</td><td>Status</td><td>설명</td>
+    <th>에러코드</th><th>Status</th><th>설명</th>
 </tr>
 <tr>
     <td>400</td><td>Duplicate User</td><td>받은 사용자가 요청</td>
@@ -160,7 +160,7 @@ Response:
 ##### 공통에러
 <table>
 <tr>
-    <td>에러코드</td><td>Status</td><td>설명</td>
+    <th>에러코드</th><th>Status</th><th>설명</th>
 </tr>
 <tr>
     <td>400</td><td>Invalid Token</td><td>잘못된 토큰 정보</td>
