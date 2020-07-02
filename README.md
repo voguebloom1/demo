@@ -67,13 +67,13 @@ Request:
     <td>400</td><td>Invalid Parameters</td><td>요청한 Body가 잘못된 정보</td>
 </tr>
 <tr>
-    <td>500</td><td>Create Token Fail</td><td>토큰 생설 실패</td>
+    <td>500</td><td>Create Token Fail</td><td>토큰 생성 실패</td>
 </tr>
 
 </table>
 
 1. 0원 또는 0명으로 요청할 수 없음. 
-2. Token은 2자리 문자열로 대소문자, 소문자, 숫자, 특수문자 총 71개 조합으로 생성.
+2. Token은 3자리 문자열로 대소문자, 소문자, 숫자, 특수문자 총 71개 조합으로 생성.
 3. Token은 대화방 당 최대 34만개 생성 가능.
    (중복 발생시 재생성 로직이 있으나 최대 100개 까지만 반복.)
    (문제 발생시 Error 응답)
@@ -88,10 +88,16 @@ URL : /api/v1/svc/moneys/{token}/receive
 </code></pre>
 
 ##### Response
+<table>
+<tr><th>key</th><th>type</th></tr>
+<tr><td>money</td><td>long</td></tr>
+</table>
 <pre><code>
 {
     "success" : true,
-    "result": {}
+    "result": {
+         "money": 21
+    }
 }  
 </code></pre>
 
@@ -157,7 +163,7 @@ Response:
 }
 </code></pre>
 
-##### 공통에러
+##### 에러
 <table>
 <tr>
     <th>에러코드</th><th>Status</th><th>설명</th>
